@@ -1,0 +1,21 @@
+This is a little of plugin ideas for SARAH. 
+
+Top news
+Top sports
+Stocks
+Read web page, like Wikipedia 
+Home automation, like controlling lights
+Take notes, dictation. Send myself email, reminders. 
+Reminders
+Shopping list
+Alarm clock
+Timer
+Sports, like Cubs score
+Alerts, like Google alerts
+Network monitor (traffic spikes, access attempts in system log)
+CPU monitor (high usage)
+Facebook
+Twitter (trends)
+Pandora (stop, start, restart, thumbs up and down)
+System processes - what's running on my system? what is network use?
+Screensaver

@@ -1,0 +1,119 @@
+<project name="Sarah" default="create-bundle" basedir=".">
+
+  <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask"/>
+
+  <!-- input stuff -->
+  <property name="classes.dir" value="../target/scala-2.9.1.final/classes" />
+  <property name="lib.dir" value="../lib" />
+  <property name="current.dir" value="." />
+  <property name="scala-lib.dir" value="scala-libs" />
+
+  <!-- output stuff -->
+  <property name="jar.dir" value="jar" />
+  <property name="release.dir" value="release" />
+  <property name="jar.filename" value="sarah.jar" />
+
+  <target name="init">
+    <tstamp/>
+  </target>
+
+  <!-- CLEAN -->
+  <target name="clean">
+    <!-- these are just needed for the first-time setup -->
+    <mkdir dir="${jar.dir}"/>
+    <mkdir dir="${release.dir}"/>
+    <!-- remove all the old jars from the jar directory -->
+    <delete>
+      <fileset dir="${jar.dir}">
+        <include name="**/*.jar"/>
+        <include name="**/*.zip"/>
+      </fileset>
+    </delete>
+    <!-- remove the old version of the app -->
+    <delete>
+      <fileset dir="${release.dir}">
+        <include name="**/*.app"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <!-- CREATE JAR -->
+  <target name="create-jar" depends="clean">
+    <!-- copy the application classes -->
+    <jar basedir="${classes.dir}" 
+         jarfile="${jar.dir}/${jar.filename}" 
+         manifest="${current.dir}/sarah.manifest"/>
+
+    <!-- copy the application jars -->
+    <copy todir="${jar.dir}">
+      <fileset dir="${lib.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+    <!-- copy the scala jars -->
+    <copy todir="${jar.dir}">
+      <fileset dir="${scala-lib.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- CREATE MAC BUNDLE (NEW) -->
+
+  <target name="create-bundle" depends="create-jar">
+  <bundleapp outputdirectory="${release.dir}"
+        name="Sarah"
+        displayname="Sarah"
+        identifier="com.devdaily.sarah.Sarah"
+        shortversion="0.2"
+        applicationCategory="public.app-category.developer-tools"
+        mainclassname="com/devdaily/sarah/Sarah">
+
+        <runtime dir="${env.JAVA_HOME}" />
+
+        <!-- need an entry for each jar file (!) -->
+        <classpath file="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar" />
+        <classpath file="lib/akka-actor-2.0.2.jar" />
+        <classpath file="lib/basicplayer3.0.jar" />
+        <classpath file="lib/commons-codec-1.4.jar" />
+        <classpath file="lib/commons-lang3-3.1.jar" />
+        <classpath file="lib/commons-logging-1.1.1.jar" />
+        <classpath file="lib/dsn.jar" />
+        <classpath file="lib/htmlcleaner-2.2.jar" />
+        <classpath file="lib/httpclient-4.1.2.jar" />
+        <classpath file="lib/httpclient-cache-4.1.2.jar" />
+        <classpath file="lib/httpcore-4.1.2.jar" />
+        <classpath file="lib/httpmime-4.1.2.jar" />
+        <classpath file="lib/imap.jar" />
+        <classpath file="lib/jl1.0.1-orig.jar" />
+        <classpath file="lib/js.jar" />
+        <classpath file="lib/jsapi.jar" />
+        <classpath file="lib/junit-4.8.1.jar" />
+        <classpath file="lib/kj_dsp1.1.jar" />
+        <classpath file="lib/lift-json_2.9.0-1-2.4-M2.jar" />
+        <classpath file="lib/mailapi.jar" />
+        <classpath file="lib/mp3spi1.9.4.jar" />
+        <classpath file="lib/paranamer-2.1.jar" />
+        <classpath file="lib/pop3.jar" />
+        <classpath file="lib/sarah.jar" />
+        <classpath file="lib/scala-library.jar" />
+        <classpath file="lib/slf4j-api-1.6.4.jar" />
+        <classpath file="lib/slf4j-simple-1.6.4.jar" />
+        <classpath file="lib/slf4s_2.9.1-1.0.7.jar" />
+        <classpath file="lib/smtp.jar" />
+        <classpath file="lib/snakeyaml-1.9.jar" />
+        <classpath file="lib/sphinx4.jar" />
+        <classpath file="lib/tritonus_share.jar" />
+
+        <option value="-Dapple.laf.useScreenMenuBar=true"/>
+        <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
+        <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
+        <option value="-Dapple.awt.application.name=MyApp"/>
+        <option value="-Dcom.apple.smallTabs=true"/>
+
+    </bundleapp>
+  </target>
+
+</project>
+
+

@@ -40,11 +40,6 @@ sh _addHiResKeyToPlistFile.sh
 # RUN
 # ---
 
-echo ""
-echo "*click security thing now*"
-echo ""
-sleep 2
-
 open deploy/release/Sarah.app
 
 #echo ""

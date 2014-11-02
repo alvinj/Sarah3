@@ -20,7 +20,6 @@ import scala.collection.mutable.ArrayBuffer
 import java.awt.BorderLayout
 import java.util.logging.FileHandler
 import java.util.logging.Logger
-import _root_.com.devdaily.sarah.gui.Sarah2MainFrameController
 import javax.swing.JEditorPane
 import java.awt.Dimension
 import java.awt.Insets
@@ -40,6 +39,7 @@ import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import javax.swing.Timer
 import com.valleyprogramming.littlelogger.LittleLogger
+import com.devdaily.sarah.gui.MainFrame3Controller
 
 /**
  * Sarah starts running in the `main` method here.
@@ -97,7 +97,7 @@ class Sarah extends Logging {
   
   // MAIN FRAME
   logger.debug("about to display main frame")
-  val mainFrameController = new Sarah2MainFrameController(this)
+  val mainFrameController = new MainFrame3Controller(this)
   val mainFrame = mainFrameController.getMainFrame
   configureMainFrame
   displayMainFrame
@@ -172,8 +172,8 @@ class Sarah extends Logging {
           mainFrame.toFront
           mainFrame.requestFocus
           mainFrame.requestFocusInWindow
-          mainFrame.getTextField.requestFocus
-          mainFrame.getTextField.requestFocusInWindow
+          mainFrameController.getTextField.requestFocus
+          mainFrameController.getTextField.requestFocusInWindow
       }
       SwingUtils.invokeLater(block)
       
@@ -538,22 +538,22 @@ class Sarah extends Logging {
       {
           def run()
           {
-              mainFrame.setResizable(true)
-              mainFrame.setLocation(getDesiredMainFrameLocation)
+              //mainFrame.setResizable(true)
+              //mainFrame.setLocation(getDesiredMainFrameLocation)
           }
       });
   }
   
-  private def getDesiredMainFrameLocation = {
-      val mainFrameWidth = mainFrame.getWidth
-      val mainFrameHeight = mainFrame.getHeight
-      val screenSize = Toolkit.getDefaultToolkit.getScreenSize
-      val screenHeight = screenSize.height
-      val screenWidth = screenSize.width
-      val y0 = screenHeight / 3.0
-      val x0 = (screenWidth - mainFrameWidth) / 2.0
-      new Point(x0.toInt, y0.toInt)
-  }
+//  private def getDesiredMainFrameLocation = {
+//      val mainFrameWidth = mainFrame.getWidth
+//      val mainFrameHeight = mainFrame.getHeight
+//      val screenSize = Toolkit.getDefaultToolkit.getScreenSize
+//      val screenHeight = screenSize.height
+//      val screenWidth = screenSize.width
+//      val y0 = screenHeight / 3.0
+//      val x0 = (screenWidth - mainFrameWidth) / 2.0
+//      new Point(x0.toInt, y0.toInt)
+//  }
   
   private def displayMainFrame {
       SwingUtilities.invokeLater(new Runnable()

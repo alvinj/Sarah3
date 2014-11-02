@@ -6,7 +6,7 @@ import com.devdaily.sarah.MainFrame2
 abstract class BaseMainFrameController {
   
   //def getMainFrame: BaseMainFrame
-  def getMainFrame: MainFrame2
+  def getMainFrame: MainFrame3
 
   def updateUIBasedOnStates
   

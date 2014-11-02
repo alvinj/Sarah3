@@ -4,7 +4,6 @@ import com.devdaily.sarah.Sarah
 import javax.swing.SwingUtilities
 import com.devdaily.sarah.plugins.PluginUtils
 import com.devdaily.sarah.actors.Brain
-import com.devdaily.sarah.MainFrame2
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.ActionListener
@@ -14,17 +13,33 @@ import javax.swing.event.DocumentEvent
 import javax.swing.JOptionPane
 import javax.swing.Timer
 import grizzled.slf4j.Logging
+import java.awt.Dimension
+import java.awt.Toolkit
 
-class Sarah2MainFrameController(sarah: Sarah)
+class MainFrame3Controller(sarah: Sarah)
 extends BaseMainFrameController with Logging {
 
-    logger.info("* Sarah2MainFrameController is Alive *")
+    logger.info("* MainFrame3Controller is Alive *")
   
-    val mainFrame = new MainFrame2("")
-    val textField = mainFrame.getTextField
-    
     // needed so i don't send the text to sarah until the 'insert' is complete
     var lastChange = System.currentTimeMillis
+
+    val mainFrame = new MainFrame3
+    mainFrame.setPreferredSize(getDesiredFrameSize)
+    mainFrame.pack
+    mainFrame.setLocationRelativeTo(null)
+    mainFrame.setTitle("Sarah")
+    //mainFrame.setVisible(true)
+
+    val textField = mainFrame.inputField
+
+    /**
+     * Timer code
+     * ----------
+     */
+    val waitTime = 1500
+    var theTextFieldSeemsToBeChanging = false
+    var timer = new Timer(waitTime, null)  // dangerous null use, but new timer is always created in the DocumentListener
 
     /**
      * this is (was?) needed to re-display the window. after (a) it is hidden with Cmd-H and
@@ -35,14 +50,6 @@ extends BaseMainFrameController with Logging {
             mainFrame.setVisible(true)
         }
     })
-
-    /**
-     * Timer code
-     * ----------
-     */
-    val waitTime = 1500
-    var theTextFieldSeemsToBeChanging = false
-    var timer = new Timer(waitTime, null)  // dangerous null use, but new timer is always created in the DocumentListener
 
     // timer doc: http://docs.oracle.com/javase/tutorial/uiswing/misc/timer.html
     // this is triggered when the timer goes off
@@ -75,16 +82,30 @@ extends BaseMainFrameController with Logging {
         def removeUpdate(e: DocumentEvent) {}
     })
 
+    // this might be necessary later
+    mainFrame.setFocusInTextField
 
+
+    /* end constructor aerea */
+    
     def getMainFrame = mainFrame
+
+    def getTextField = mainFrame.inputField
+
     def updateUIBasedOnStates {}
     
     def updateUISpeakingHasEnded {
         textField.setText("")
     }
     
-//    def getTime = System.currentTimeMillis
-  
+    private def getDesiredFrameSize: Dimension = {
+        val screenSize = Toolkit.getDefaultToolkit.getScreenSize
+        val height = screenSize.height * 2 / 3
+        val width = (1.6 * height).asInstanceOf[Int]
+        new Dimension(width, height)
+    }
+    
+
 }
 
 

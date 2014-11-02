@@ -56,6 +56,7 @@ object ComputerVoice extends Logging {
       return false
   }
 
+  // TODO return a boolean or do something else to let the caller know if the call succeeded or not
   def speak(sentence: String) {
       System.out.println("(ComputerVoice) ENTERED SPEAK(" + sentence + ") AT " + System.currentTimeMillis)
       val thingToSay = "say \"" + sentence + "\""
@@ -70,6 +71,7 @@ object ComputerVoice extends Logging {
       }
   }
 
+  // TODO return a boolean or do something else to let the caller know if the call succeeded or not
   def speak(sentence: String, voice: String) {
       val thingToSay = "say \"" + sentence + "\"" + "using \"" + voice + "\""
       val scriptEngineManager = new ScriptEngineManager

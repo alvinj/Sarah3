@@ -40,6 +40,11 @@ import java.awt.event.ActionEvent
 import javax.swing.Timer
 import com.valleyprogramming.littlelogger.LittleLogger
 import com.devdaily.sarah.gui.MainFrame3Controller
+import java.awt.Robot
+import java.awt.event.InputEvent
+import java.awt.event.KeyEvent
+import javax.script.ScriptEngineManager
+import com.devdaily.sarah.utils.AppleScriptUtils
 
 /**
  * Sarah starts running in the `main` method here.
@@ -102,12 +107,12 @@ class Sarah extends Logging {
   configureMainFrame
   displayMainFrame
   
-  // this is the secondary window i use in Sarah2 to display output
-  val textWindow = new TextWindowBuilder(
-          "",
-          new Dimension(mainFrame.getWidth, 400), 
-          new Point(372, 395))  // MBP
-//          new Point(610, 484))  // iMac
+//  // this is the secondary window i use in Sarah2 to display output
+//  val textWindow = new TextWindowBuilder(
+//          "",
+//          new Dimension(mainFrame.getWidth, 400), 
+//          new Point(372, 395))  // MBP
+////          new Point(610, 484))  // iMac
 
 
   // ----- end constructor -----
@@ -161,6 +166,20 @@ class Sarah extends Logging {
    * UI and Other Code
    * ---------------------------------------------
    */
+  
+  /**
+   * when the frame/window gains focus, put focus in the text field, and
+   * start the speech recog 
+   */
+  def handleWindowGainedFocusEvent {
+      startSpeechRecognitioner
+  }
+  
+  // the 'fn' key is applescript "key code 36"
+  private def startSpeechRecognitioner {
+      // NOTE i'm ignoring whether it succeeded or not as that will be obvious
+      val succeeded = AppleScriptUtils.executeAppleScriptCommand(Global.appleScriptCmdToStartSpeechRecognition)
+  }
 
   // TODO figure out what *really* needs to be done to get focus back to the input window.
   // this works, but as you can see, it's a kludge.
@@ -211,7 +230,7 @@ class Sarah extends Logging {
   }
 
   def displayAvailableVoiceCommands(voiceCommands: scala.collection.immutable.List[String]) {
-    //mainFrameController.displayAvailableVoiceCommands(voiceCommands)
+      showTextWindow(voiceCommands.mkString("\n"))
   }
   
   def tryToHandleTextWithPlugins(textTheUserSaid: String): Boolean = {
@@ -228,14 +247,12 @@ class Sarah extends Logging {
   }
 
   def showTextWindow(textToShow: String) {
-      // show the text window
-      textWindow.setText(textToShow)
-      textWindow.setVisible(true)
+      mainFrameController.showOutput(textToShow)
       requestFocusInWindowAndTextField
   }
   
   def hideTextWindow {
-      textWindow.setVisible(false)
+      mainFrameController.clearOutput
       requestFocusInWindowAndTextField
   }
   

@@ -123,37 +123,37 @@ with Logging
 
   // handle the text the computer thinks the user said
   private def handleVoiceCommand(whatTheComputerThinksISaid: String) {
-    logger.info("entered handleVoiceCommand, text is: " + whatTheComputerThinksISaid)
+      logger.info("entered handleVoiceCommand, text is: " + whatTheComputerThinksISaid)
 
-    val textTheUserSaid = whatTheComputerThinksISaid.toLowerCase
+      val textTheUserSaid = whatTheComputerThinksISaid.toLowerCase
 
-    // re-load these to let the user change commands while we run
-    loadAllUserConfigurationFilesOrDie
+      // re-load these to let the user change commands while we run
+      loadAllUserConfigurationFilesOrDie
 
-    if (handleSpecialVoiceCommands(textTheUserSaid)) {
-        logger.info("Handled a special voice command, returning.")
-        return
-    }
+      if (handleSpecialVoiceCommands(textTheUserSaid)) {
+          logger.info("Handled a special voice command, returning.")
+          return
+      }
 
-    // if the command phrase is in the map, do some work
-    if (phraseToCommandMap.containsKey(textTheUserSaid)) {
-        logger.info("phraseToCommandMap contained key, trying to process")
-        // handle whatever the user said
-        logger.info("handleVoiceCommand, found your phrase in the map: " + textTheUserSaid)
-        val handled = handleUserDefinedVoiceCommand(textTheUserSaid)
-    }
-    else {
-        // there were no matches; check the plugins registered with sarah
-        logger.info(format("phraseToCommandMap didn't have key (%s), trying plugins", textTheUserSaid))
-        val handled = sarah.tryToHandleTextWithPlugins(textTheUserSaid)
-        if (handled) {
-            brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
-        } else {
-            // TODO a bit of a kludge to update the ui; i don't really use these states in Sarah2
-            brain ! PleaseSay(getRandomImSorryPhrase)
-            brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
-        }
-    }
+      // if the command phrase is in the map, do some work
+      if (phraseToCommandMap.containsKey(textTheUserSaid)) {
+          // handle whatever the user said
+          logger.info("phraseToCommandMap contained key, trying to process")
+          logger.info("handleVoiceCommand, found your phrase in the map: " + textTheUserSaid)
+          // TODO why do i get 'handled' here?
+          val handled = handleUserDefinedVoiceCommand(textTheUserSaid)
+      } else {
+          // there were no matches; check the plugins registered with sarah
+          logger.info(format("phraseToCommandMap didn't have key (%s), trying plugins", textTheUserSaid))
+          val handled = sarah.tryToHandleTextWithPlugins(textTheUserSaid)
+          if (handled) {
+              brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
+          } else {
+              // TODO a bit of a kludge to update the ui; i don't really use these states in Sarah2
+              brain ! PleaseSay(getRandomImSorryPhrase)
+              brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
+          }
+      }
   }
 
   private def getRandomImSorryPhrase = {
@@ -175,27 +175,27 @@ with Logging
   }
   
   // TODO there's probably a better way to do this
-  def getAwarenessState:Int = {
-    implicit val timeout = Timeout(2 seconds)
-    val future = brain ? GetAwarenessState
-    val result = Await.result(future, timeout.duration).asInstanceOf[Int]
-    result
+  def getAwarenessState: Int = {
+      implicit val timeout = Timeout(2 seconds)
+      val future = brain ? GetAwarenessState
+      val result = Await.result(future, timeout.duration).asInstanceOf[Int]
+      result
   }
 
   // TODO there's probably a better way to do this
-  def getEarsState:Int = {
-    implicit val timeout = Timeout(2 seconds)
-    val future = brain ? GetEarsState
-    val result = Await.result(future, timeout.duration).asInstanceOf[Int]
-    result
+  def getEarsState: Int = {
+      implicit val timeout = Timeout(2 seconds)
+      val future = brain ? GetEarsState
+      val result = Await.result(future, timeout.duration).asInstanceOf[Int]
+      result
   }
 
   // TODO there's probably a better way to do this
-  def inSleepMode:Boolean = {
-    implicit val timeout = Timeout(2 seconds)
-    val future = brain ? GetInSleepMode
-    val result = Await.result(future, timeout.duration).asInstanceOf[Boolean]
-    result
+  def inSleepMode: Boolean = {
+      implicit val timeout = Timeout(2 seconds)
+      val future = brain ? GetInSleepMode
+      val result = Await.result(future, timeout.duration).asInstanceOf[Boolean]
+      result
   }
   
   /**
@@ -203,50 +203,52 @@ with Logging
    * user via configuration files, like "go to sleep", "wake up", and
    * "shut down". Returns true if the voice command was handled.
    */
-  private def handleSpecialVoiceCommands(textTheUserSaid: String):Boolean = {
-    logger.info("entered handleSpecialVoiceCommands")
-
-    if (textTheUserSaid.trim().equals("")) { 
-        logger.info("(Brain) Got a blank string from Ears, ignoring it.")
-        return true
-    }
-
-    else if (textTheUserSaid.trim.equals("thanks") || textTheUserSaid.trim.equals("thank you")) { 
-        replyToUserSayingThankYou
-        return true
-    }
-
-    else if (textTheUserSaid.trim.equals("computer")) { 
-        replyToUserSayingComputer
-        return true
-    }
-
-    // "close the window", "hide the window", "close window"
-    else if (textTheUserSaid.trim.toLowerCase.matches("(close|hide) .*window")) { 
-        brain ! HideTextWindow
-        brain ! MouthIsFinishedSpeaking  //TODO i don't like handling this as a special case
-        return true
-    }
-
-    else if (textTheUserSaid.trim.toLowerCase.matches("(bye|goodbye|adios|later) *(sarah)*")
-             || textTheUserSaid.trim.toLowerCase.matches("laters* (baby|sarah)")) { 
-        speak("Live long, and prosper.")
-        PluginUtils.sleep(2000)
-        sarah.shutdown
-        return true
-    }
-
-    else if (!inSleepMode && textTheUserSaid.matches(".*go to sleep.*")) {
-        doGoToSleepActions
-        return true
-    }
-
-    else if (!inSleepMode && textTheUserSaid.matches(".*what can i say.*")) {
-        listAvailableVoiceCommands
-        return true
-    }
+  private def handleSpecialVoiceCommands(textTheUserSaid: String): Boolean = {
+      logger.info("entered handleSpecialVoiceCommands")
     
-    return false
+      if (textTheUserSaid.trim.equals("")) { 
+          logger.info("(Brain) Got a blank string from Ears, ignoring it.")
+          return true
+      }
+
+      else if (textTheUserSaid.trim.equals("thanks") || textTheUserSaid.trim.equals("thank you")) { 
+          replyToUserSayingThankYou
+          return true
+      }
+
+      else if (textTheUserSaid.trim.equals("computer")) { 
+          replyToUserSayingComputer
+          return true
+      }
+
+      // "close the window", "hide the window", "close window"
+      //else if (textTheUserSaid.trim.toLowerCase.matches("(close|shut) .*window")) { 
+      else if (textTheUserSaid.trim.toLowerCase.matches("clear")) { 
+          brain ! HideTextWindow
+          brain ! MouthIsFinishedSpeaking
+          return true
+      }
+
+      else if (textTheUserSaid.trim.toLowerCase.matches("(bye|goodbye|adios|later) *(sarah)*")
+               || textTheUserSaid.trim.toLowerCase.matches("later's* (baby|sarah)")) { 
+          speak("Live long, and prosper.")
+          PluginUtils.sleep(2000)
+          sarah.shutdown
+          return true
+      }
+
+      else if (!inSleepMode && textTheUserSaid.matches(".*go to sleep.*")) {
+          doGoToSleepActions
+          return true
+      }
+
+      else if (!inSleepMode && textTheUserSaid.matches(".*what can i say.*")) {
+          listAvailableVoiceCommands
+          brain ! MouthIsFinishedSpeaking  // added 2014/11/03
+          return true
+      }
+        
+      return false
   }
 
   /**
@@ -408,7 +410,7 @@ with Logging
   /**
    * List all the voice command the user can say.
    */
-  private def listAvailableVoiceCommands() {
+  private def listAvailableVoiceCommands {
       // get all voice commands from the config files (populates allVoiceCommands)
       loadAllUserConfigurationFilesOrDie
     
@@ -420,7 +422,8 @@ with Logging
       voiceCommandListForSarah += "what can i say?"
       voiceCommandListForSarah += "soylent green is people"
       voiceCommandListForSarah += "please listen"
-      
+
+      // TODO it's a really bad idea to call back to sarah like this
       sarah.displayAvailableVoiceCommands(voiceCommandListForSarah.toList)
   }
   

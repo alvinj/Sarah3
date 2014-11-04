@@ -9,12 +9,13 @@ class MainFrame3 extends JFrame {
 
     val inputField = new JTextField
     val outputArea = new JEditorPane
+    val scrollPane = new JScrollPane(outputArea)
     
     configureInputField
     configureOutputArea
     
     getContentPane.add(inputField, BorderLayout.NORTH)
-    getContentPane.add(outputArea, BorderLayout.CENTER)
+    getContentPane.add(scrollPane, BorderLayout.CENTER)
     
     private def configureOutputArea {
         outputArea.setEditable(false)

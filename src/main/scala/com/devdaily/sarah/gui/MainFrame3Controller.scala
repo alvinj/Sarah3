@@ -15,9 +15,13 @@ import javax.swing.Timer
 import grizzled.slf4j.Logging
 import java.awt.Dimension
 import java.awt.Toolkit
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+import java.awt.event.WindowFocusListener
 
 class MainFrame3Controller(sarah: Sarah)
-extends BaseMainFrameController with Logging {
+extends BaseMainFrameController 
+with Logging {
 
     logger.info("* MainFrame3Controller is Alive *")
   
@@ -29,9 +33,11 @@ extends BaseMainFrameController with Logging {
     mainFrame.pack
     mainFrame.setLocationRelativeTo(null)
     mainFrame.setTitle("Sarah")
-    //mainFrame.setVisible(true)
 
+    configureMainFrameSoSpeechRecognitionStartsOnWindowFocus
+    
     val textField = mainFrame.inputField
+    val outputArea = mainFrame.outputArea
 
     /**
      * Timer code
@@ -86,7 +92,24 @@ extends BaseMainFrameController with Logging {
     mainFrame.setFocusInTextField
 
 
-    /* end constructor aerea */
+    /* end constructor area */
+    
+    private def configureMainFrameSoSpeechRecognitionStartsOnWindowFocus {
+        val windowAdapter = new WindowAdapter {
+            override def windowGainedFocus(e: WindowEvent) {
+                sarah.handleWindowGainedFocusEvent
+            }
+        }
+        mainFrame.addWindowFocusListener(windowAdapter)
+    }
+    
+    def showOutput(text: String) {
+        outputArea.setText(text)
+    }
+    
+    def clearOutput {
+        outputArea.setText("")
+    }
     
     def getMainFrame = mainFrame
 

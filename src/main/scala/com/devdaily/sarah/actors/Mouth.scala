@@ -17,8 +17,6 @@ case class InitMouthMessage
  */
 class Mouth(sarah: Sarah) extends akka.actor.Actor with Logging {
   
-  logger.info("* The Mouth is Alive *")
-  
   // this assumes that the Brain is alive before the Mouth
   val brain: ActorRef = context.actorFor("../Brain")
 

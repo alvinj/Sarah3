@@ -167,6 +167,10 @@ class Sarah extends Logging {
    * ---------------------------------------------
    */
   
+  def clearInputArea {
+      mainFrameController.clearInputWidget
+  }
+  
   /**
    * when the frame/window gains focus, put focus in the text field, and
    * start the speech recog 

@@ -88,7 +88,7 @@ with Logging
   private def handleSomethingWeHeard(whatWeHeard: String,
                                      inSleepMode: Boolean,
                                      awarenessState: Int) {
-    if (whatWeHeard==null || whatWeHeard.trim().equals("")) return
+    if (whatWeHeard==null || whatWeHeard.trim.equals("")) return
     if (inSleepMode) {
         logger.info("in sleep mode, checking to see if this is a WakeUp request")
         // if we're sleeping, the only request we respond to is "wake up"
@@ -125,6 +125,9 @@ with Logging
   private def handleVoiceCommand(whatTheComputerThinksISaid: String) {
       logger.info("entered handleVoiceCommand, text is: " + whatTheComputerThinksISaid)
 
+      // clear the input widget (currently a textfield) asap
+      brain ! BrainHelperIsHandlingSpokenRequest
+
       val textTheUserSaid = whatTheComputerThinksISaid.toLowerCase
 
       // re-load these to let the user change commands while we run
@@ -140,8 +143,7 @@ with Logging
           // handle whatever the user said
           logger.info("phraseToCommandMap contained key, trying to process")
           logger.info("handleVoiceCommand, found your phrase in the map: " + textTheUserSaid)
-          // TODO why do i get 'handled' here?
-          val handled = handleUserDefinedVoiceCommand(textTheUserSaid)
+          handleUserDefinedVoiceCommand(textTheUserSaid)  // ignoring boolean return value
       } else {
           // there were no matches; check the plugins registered with sarah
           logger.info(format("phraseToCommandMap didn't have key (%s), trying plugins", textTheUserSaid))

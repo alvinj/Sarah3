@@ -21,7 +21,6 @@ object AppleScriptUtils extends Logging {
                 logger.error(e.getStackTrace.mkString("\n"))
                 false
         }
-      
     }
 
 }

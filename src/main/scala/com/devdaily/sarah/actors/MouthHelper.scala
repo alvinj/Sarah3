@@ -48,14 +48,15 @@ with Logging
    */
   def speak(textToSpeak: String) {
       logger.info("ENTERED MouthHelper::speak")
+      val start = System.currentTimeMillis
+      logger.info(s"MOUTH starting to speak at $start")
       mouth ! MouthIsSpeaking
-      logger.info("        MouthHelper::speak, calling ComputerVoice.speak(textToSpeak)")
       ComputerVoice.speak(textToSpeak)
-      logger.info("        MouthHelper::speak, after ComputerVoice.speak(textToSpeak)")
       PluginUtils.sleep(Brain.SHORT_DELAY)
-      logger.info("        MouthHelper::speak, after PluginUtils.sleep")
       mouth ! MouthIsFinishedSpeaking
-      logger.info("ENTERED MouthHelper::speak")
+      val stop = System.currentTimeMillis
+      logger.info(s"MOUTH stopping at $stop")
+      logger.info(s"MOUTH delta = ${stop - start}")
   }
   
   /**

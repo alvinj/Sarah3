@@ -23,8 +23,6 @@ class MainFrame3Controller(sarah: Sarah)
 extends BaseMainFrameController 
 with Logging {
 
-    logger.info("* MainFrame3Controller is Alive *")
-  
     // needed so i don't send the text to sarah until the 'insert' is complete
     var lastChange = System.currentTimeMillis
 
@@ -36,7 +34,7 @@ with Logging {
 
     configureMainFrameSoSpeechRecognitionStartsOnWindowFocus
     
-    val textField = mainFrame.inputField
+    val inputWidget = mainFrame.inputField
     val outputArea = mainFrame.outputArea
 
     /**
@@ -62,21 +60,21 @@ with Logging {
     val textFieldListener = new ActionListener {
         def actionPerformed(ae: ActionEvent) {
             logger.info("*** got text input ***")
-            logger.info("*** CALLING BRAIN WITH TEXT = " + textField.getText)
+            logger.info("*** CALLING BRAIN WITH TEXT = " + inputWidget.getText)
             theTextFieldSeemsToBeChanging = false
             timer.stop
-            sarah.sendPhraseToBrain(textField.getText)
+            sarah.sendPhraseToBrain(inputWidget.getText)
         }
     }
 
-    textField.getDocument.addDocumentListener(new DocumentListener() {
+    inputWidget.getDocument.addDocumentListener(new DocumentListener() {
         def insertUpdate(e: DocumentEvent) {
             if (theTextFieldSeemsToBeChanging) {
                 timer.restart
-                logger.info("TEXTFIELD IS CHANGING, TEXT: " + textField.getText)
+                logger.info("TEXTFIELD IS CHANGING, TEXT: " + inputWidget.getText)
             } else {
                 // textfield hasn't changed in a while, and just received its first insert event
-                logger.info("STARTING NEW TIMER, TEXT = " + textField.getText)
+                logger.info("STARTING NEW TIMER, TEXT = " + inputWidget.getText)
                 timer = new Timer(waitTime, textFieldListener)
                 timer.setRepeats(false)
                 timer.setCoalesce(true)
@@ -93,6 +91,10 @@ with Logging {
 
 
     /* end constructor area */
+    
+    def clearInputWidget {
+        SwingUtils.invokeLater(inputWidget.setText(""))
+    }
     
     private def configureMainFrameSoSpeechRecognitionStartsOnWindowFocus {
         val windowAdapter = new WindowAdapter {
@@ -118,7 +120,7 @@ with Logging {
     def updateUIBasedOnStates {}
     
     def updateUISpeakingHasEnded {
-        textField.setText("")
+        inputWidget.setText("")
     }
     
     private def getDesiredFrameSize: Dimension = {

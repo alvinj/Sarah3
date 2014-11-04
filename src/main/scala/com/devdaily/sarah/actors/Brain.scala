@@ -86,6 +86,10 @@ with Logging
     
     private var akkaPluginInstances = ArrayBuffer[SarahAkkaActorBasedPlugin]()
     private var akkaPluginReferences = ArrayBuffer[ActorRef]()
+    
+    // variables used to help keep sarah from listening to herself
+    private var lastTimeBrainStartedSpeaking = 0L
+    private var lastTimeBrainStoppedSpeaking = 0L
   
     def receive = {
       
@@ -100,17 +104,16 @@ with Logging
   
       case SetMinimumWaitTimeAfterSpeaking(waitTime) =>
            setMinimumWaitAfterSpeakingTime(waitTime)
-           
+
       // actions
   
       case pleaseSay: PleaseSay =>
            logger.info(format("%d - got PleaseSay request", getCurrentTime))
            handlePleaseSayRequest(pleaseSay)
   
+      // this message comes from Sarah (the ui)
       case message: MessageFromEars =>
-           logger.info(format("%d - got MessageFromEars", getCurrentTime))
-           logger.info(format("    message was: " + message.textFromUser))
-           handleMessageFromEars(message)
+           handleMessageFromEars(message, System.currentTimeMillis)
   
       case playSoundFileRequest: PlaySoundFileRequest =>
            logger.info(format("%d - got PlaySoundFileRequest", getCurrentTime))
@@ -135,6 +138,8 @@ with Logging
       case MouthIsFinishedSpeaking =>
            handleMouthIsFinishedSpeakingMessage
            
+           
+      // TODO a lot of this "state" code is old and can be deleted
       case SetAwarenessState(state) =>
            setAwarenessState(state)
            
@@ -196,12 +201,13 @@ with Logging
     }
   
     def handleMouthIsSpeakingMessage {
+        lastTimeBrainStartedSpeaking = System.currentTimeMillis
         mouthIsSpeaking = true
     }
     
     def handleMouthIsFinishedSpeakingMessage {
         // try to keep sarah from listening to herself
-        Thread.sleep(500)
+        lastTimeBrainStoppedSpeaking = System.currentTimeMillis
         markThisAsTheLastTimeSarahSpoke
         mouthIsSpeaking = false
         tellUISpeakingHasEnded
@@ -269,10 +275,18 @@ with Logging
      * determine whether we think sarah just finished speaking.
      * if so, return true, else false.
      */
-    def sarahJustFinishedSpeaking: Boolean = {
-        val timeSinceSarahLastSpoke = getCurrentTime - lastTimeSarahSpoke
-        logger.info(format("timeSinceSarahLastSpoke = %d", timeSinceSarahLastSpoke))
-        if (timeSinceSarahLastSpoke < minimumWaitTime) true else false
+    def sarahJustFinishedSpeaking(timestamp: Long): Boolean = {
+        val timeSinceSarahLastStartedSpeaking = timestamp - lastTimeBrainStartedSpeaking
+        val timeSinceSarahLastStoppedSpeaking = timestamp - lastTimeBrainStoppedSpeaking
+        logger.info(s"TIME: timeSinceSarahLastStartedSpeaking = $timeSinceSarahLastStartedSpeaking")
+        logger.info(s"TIME: timeSinceSarahLastStoppedSpeaking = $timeSinceSarahLastStoppedSpeaking")
+
+        // this is just a first guess
+        if (timeSinceSarahLastStoppedSpeaking < minimumWaitTime) true else false
+        
+//        val timeSinceSarahLastSpoke = getCurrentTime - lastTimeSarahSpoke
+//        logger.info(format("timeSinceSarahLastSpoke = %d", timeSinceSarahLastSpoke))
+//        if (timeSinceSarahLastSpoke < minimumWaitTime) true else false
     }
   
     // let sarah set this with her new properties file
@@ -286,13 +300,15 @@ with Logging
         logger.info(format("lastTimeSarahSpoke = %d", getCurrentTime))
     }
     
-    def handleMessageFromEars(message: MessageFromEars) {
+    def handleMessageFromEars(message: MessageFromEars, timestamp: Long) {
       logger.info("entered handleMessageFromEars")
       if (mouthIsSpeaking) {
           logger.info(format("sarah is speaking, ignoring message from ears (%s)", message.textFromUser))
+          return
       }
-      else if (sarahJustFinishedSpeaking) {
+      else if (sarahJustFinishedSpeaking(timestamp)) {
           logger.info(format("sarah just spoke, ignoring message from ears (%s)", message.textFromUser))
+          return
       } 
       else {
           logger.info(format("passing MessageFromEars to brainSomethingWasHeardHelper (%s)", message.textFromUser))

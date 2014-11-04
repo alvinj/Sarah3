@@ -35,8 +35,6 @@ extends Actor
 with Logging
 {
 
-  logger.info("* The BrainHeardSomethingHelper is Alive *")
-  
   // TODO an assumption here is that the Mouth actor exists before we do; may not be safe, so i used a var earlier
   val brain: ActorRef = context.parent                    // Brain is our parent
   //val mouth: ActorRef = context.actorFor("../../Mouth")   
@@ -108,12 +106,12 @@ with Logging
    */
   private def handleWakeUpRequestIfReceived(whatTheComputerThinksISaid: String,
                                             awarenessState: Int) {
-    val prevSleepState = awarenessState
-    if (whatTheComputerThinksISaid.matches(".*wake up.*")) {
-        doWakeUpActions
-    } else {
-        brain ! SetEarsState(Brain.EARS_STATE_LISTENING)
-    }
+      val prevSleepState = awarenessState
+      if (whatTheComputerThinksISaid.matches(".*wake up.*")) {
+          doWakeUpActions
+      } else {
+          brain ! SetEarsState(Brain.EARS_STATE_LISTENING)
+      }
   }
 
   def getAppleScriptEngine: javax.script.ScriptEngine = {
@@ -151,8 +149,10 @@ with Logging
           if (handled) {
               brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
           } else {
+              // 2014/11/04 commenting this first line out. i might want to show a red light in the ui that sarah
+              // didn't understand something, but i don't like this approach
               // TODO a bit of a kludge to update the ui; i don't really use these states in Sarah2
-              brain ! PleaseSay(getRandomImSorryPhrase)
+              //brain ! PleaseSay(getRandomImSorryPhrase)
               brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
           }
       }

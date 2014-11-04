@@ -44,19 +44,18 @@ with Logging
 
   /**
    * Speak whatever needs to be spoken, then wait the given time
-   * before returning.
+   * before returning. 
+   * 
+   * Important: This method does not return until the text has
+   * been completely read by the Mac "text to speech" facility. Speaking may take
+   * two seconds, 10 seconds, whatever. This can be handled differently, but this 
+   * is how it works right now.
    */
   def speak(textToSpeak: String) {
-      logger.info("ENTERED MouthHelper::speak")
-      val start = System.currentTimeMillis
-      logger.info(s"MOUTH starting to speak at $start")
       mouth ! MouthIsSpeaking
       ComputerVoice.speak(textToSpeak)
       PluginUtils.sleep(Brain.SHORT_DELAY)
       mouth ! MouthIsFinishedSpeaking
-      val stop = System.currentTimeMillis
-      logger.info(s"MOUTH stopping at $stop")
-      logger.info(s"MOUTH delta = ${stop - start}")
   }
   
   /**

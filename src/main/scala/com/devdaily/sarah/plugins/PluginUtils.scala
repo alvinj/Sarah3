@@ -17,16 +17,16 @@ object PluginUtils {
    * lines of strings that are meant to be read in as an array/list.
    */
   def getRandomStringFromFile(canonicalFilename: String): String = {
-    val options = Source.fromFile(canonicalFilename).getLines.toList
-    return options(Random.nextInt(options.length))
+      val options = Source.fromFile(canonicalFilename).getLines.toList
+      return options(Random.nextInt(options.length))
   }
   
   def getFileContentsAsString(canonicalFilename: String): String = {
-    return Source.fromFile(canonicalFilename).mkString
+      return Source.fromFile(canonicalFilename).mkString
   }
   
   def getFileContentsAsList(canonicalFilename: String): List[String] = {
-    return Source.fromFile(canonicalFilename).getLines.toList
+      return Source.fromFile(canonicalFilename).getLines.toList
   }
 
   val getFilepathSeparator = System.getProperty("file.separator")
@@ -36,51 +36,53 @@ object PluginUtils {
    * sleepTime is in millis.
    */
   def sleep(sleepTime: Int) {
-    try {
-      Thread.sleep(sleepTime)
-    }
-    catch {
-      case _: Throwable => // do nothing
-    }
+      try {
+          Thread.sleep(sleepTime)
+      }
+      catch {
+          case _: Throwable => // do nothing
+      }
   }
-
+  
   /**
    * As "Wednesday, October 20"
    */
   def getCurrentDate:String = {
-    return getCurrentDateTime("EEEE, MMMM d")
+      return getCurrentDateTime("EEEE, MMMM d")
   }
+
+  def getCurrentTimestamp = System.currentTimeMillis
 
   /**
    * As "6:20 p.m."
    */
   def getCurrentTime: String = {
-    return getCurrentDateTime("K:m aa")
+      return getCurrentDateTime("K:m aa")
   }
 
   /**
    * As "Wednesday, October 20, 6:20 p.m."
    */
   def getCurrentDateAndTime: String = {
-    return getCurrentDateTime("EEEE, MMMM d, K:m aa")
+      return getCurrentDateTime("EEEE, MMMM d, K:m aa")
   }
 
   /**
    * A common function used by other date/time functions.
    */
   private def getCurrentDateTime(dateTimeFormat: String): String = {
-    val dateFormat = new SimpleDateFormat(dateTimeFormat)
-    val cal = Calendar.getInstance()
-    return dateFormat.format(cal.getTime())
+      val dateFormat = new SimpleDateFormat(dateTimeFormat)
+      val cal = Calendar.getInstance
+      return dateFormat.format(cal.getTime)
   }
   
   /**
  * Read a Java properties file and return it as a Properties object.
  */
   def readPropertiesFile(filename: String):Properties = {
-    val properties = new Properties
-    properties.load(new FileInputStream(filename))
-    return properties
+      val properties = new Properties
+      properties.load(new FileInputStream(filename))
+      return properties
   }
   
 
@@ -88,7 +90,7 @@ object PluginUtils {
    * Returns an Array[File] of all files in the given dir.
    */
   def getListOfFiles(dirName: String):Array[File] = {
-    return new File(dirName).listFiles
+      return new File(dirName).listFiles
   }
 
   /**
@@ -99,18 +101,18 @@ object PluginUtils {
    * new java.io.File(dirName).listFiles.filter(_.getName.endsWith(".txt"))
    */
   def getListOfFiles(dirName: String, fileFilter:FileFilter):Array[File] = {
-    return new File(dirName).listFiles(fileFilter)
+      return new File(dirName).listFiles(fileFilter)
   }
 
   // note that this is extends, not "implements", as in java
   def getSoundFileFilter = new FileFilter {
-    val okFileExtensions = Array("wav", "mp3")
-    def accept(file: File):Boolean = {
-      for (extension <- okFileExtensions) {
-        if (file.getName.toLowerCase.endsWith(extension)) return true
+      val okFileExtensions = Array("wav", "mp3")
+      def accept(file: File):Boolean = {
+          for (extension <- okFileExtensions) {
+              if (file.getName.toLowerCase.endsWith(extension)) return true
+          }
+          return false
       }
-      return false
-    }
   }
   
   /**
@@ -118,8 +120,8 @@ object PluginUtils {
    * from http://stackoverflow.com/questions/2637643/how-do-i-list-all-files-in-a-subdirectory-in-scala
    */
   def getRecursiveListOfFiles(dir: File): Array[File] = {
-    val these = dir.listFiles
-    these ++ these.filter(_.isDirectory).flatMap(getRecursiveListOfFiles)
+      val these = dir.listFiles
+      these ++ these.filter(_.isDirectory).flatMap(getRecursiveListOfFiles)
   }
   
   

@@ -4,6 +4,20 @@ SARAH Concepts
 
 Notes for SARAH programmers, and SARAH plugin programmers.
 
+
+How Sarah Hears Things
+----------------------
+
+In Sarah3, here's how Sarah hears things:
+
+* We start the Mac "speech to text" facility
+* Focus needs to be in our input textfield
+* We wait until the text being typed into the input textfield "settles down"
+* When that text stops, the MainFrameController calls Sarah's `sendPhraseToBrain` method
+* That method execs this: =brain ! MessageFromEars(whatWasHeard)=
+* 
+
+
 Sarah
 -----
 

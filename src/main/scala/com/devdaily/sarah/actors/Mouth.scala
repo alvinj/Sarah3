@@ -42,12 +42,10 @@ class Mouth(sarah: Sarah) extends akka.actor.Actor with Logging {
 
     case MouthIsSpeaking =>
          // get this from our helper, pass it on
-         logger.info(s"Mouth got MouthIsSpeaking message from MouthHelper")
          brain ! MouthIsSpeaking
          
     case MouthIsFinishedSpeaking =>
          // get this from our helper, pass it on
-         logger.info(s"Mouth got MouthIsFinishedSpeaking message from MouthHelper")
          brain ! MouthIsFinishedSpeaking
 
     case unknown => 
@@ -59,7 +57,6 @@ class Mouth(sarah: Sarah) extends akka.actor.Actor with Logging {
    * there are better ways to do this.
    */
   def startMouthHelper {
-      logger.info(s"starting MouthHelper")
       mouthHelper = context.actorOf(Props(new MouthHelper(sarah)), name = "MouthHelper")
   }
 

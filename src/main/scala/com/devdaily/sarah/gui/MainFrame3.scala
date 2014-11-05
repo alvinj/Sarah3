@@ -2,6 +2,9 @@ package com.devdaily.sarah.gui
 
 import javax.swing._
 import java.awt._
+import com.jgoodies.forms.layout.FormLayout
+import com.jgoodies.forms.builder.PanelBuilder
+import com.jgoodies.forms.layout.CellConstraints
 
 trait StatusIndicator
 case object RedLight extends StatusIndicator
@@ -10,6 +13,8 @@ case object GreenLight extends StatusIndicator
 case object NeutralLight extends StatusIndicator
 
 class MainFrame3 extends JFrame {
+  
+    import SwingUtils.invokeLater
   
     // status icon images 
     val trafficLightRed = new ImageIcon(classOf[MainFrame3].getResource("trafficLightRedSmall.jpg"))
@@ -20,16 +25,10 @@ class MainFrame3 extends JFrame {
     setLayout(new BorderLayout)
 
     // input area
-    // TODO fix this layout with jgoodies or other
     val statusLabel = new JLabel
     val inputField = new JTextField
-    inputField.setPreferredSize(new Dimension(910, 44))
-    val inputPanel = new JPanel
-    val inputLayout = new FlowLayout(FlowLayout.LEFT, 10, 0)
-    inputPanel.setLayout(inputLayout)
     statusLabel.setIcon(trafficLightNeutral)
-    inputPanel.add(statusLabel)
-    inputPanel.add(inputField)
+    val inputPanel = buildInputPanel
     
     // output area
     val outputArea = new JEditorPane
@@ -42,12 +41,35 @@ class MainFrame3 extends JFrame {
     getContentPane.add(scrollPane, BorderLayout.CENTER)
     
     def setStatusIndicator(status: StatusIndicator): Unit = status match {
-        case RedLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightRed))
-        case YellowLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightYellow))
-        case GreenLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightGreen))
-        case NeutralLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightNeutral))
+        case RedLight => invokeLater(statusLabel.setIcon(trafficLightRed))
+        case YellowLight => invokeLater(statusLabel.setIcon(trafficLightYellow))
+        case GreenLight => invokeLater(statusLabel.setIcon(trafficLightGreen))
+        case NeutralLight => invokeLater(statusLabel.setIcon(trafficLightNeutral))
     }
     
+    /** 
+     *  the "input panel" that goes in the North section of the Sarah3 mainframe BorderLayout.
+     */
+    private def buildInputPanel: JPanel = {
+      
+        val layout = new FormLayout(
+                //    label       textfield
+                //    -----       ---------
+                "3px, 48px,  8px, pref:grow, 2dlu",  //columns
+                //    -----       ---------
+                "3dlu, p, 3dlu"                      //rows
+        )
+        val builder = new PanelBuilder(layout)
+        builder.setDefaultDialogBorder
+    
+        val cc = new CellConstraints    
+        builder.add(statusLabel, cc.xy(2, 2))
+        builder.add(inputField,  cc.xy(4, 2))
+
+        return builder.getPanel
+    
+    }
+
     private def configureOutputArea {
         outputArea.setEditable(false)
         outputArea.setFont(inputField.getFont.deriveFont(20.0f))
@@ -68,7 +90,7 @@ class MainFrame3 extends JFrame {
      */
     def setFocusInTextField {
         val mainFrame = this
-        SwingUtilities.invokeLater(new Runnable {
+        invokeLater(new Runnable {
             def run {
                 mainFrame.requestFocusInWindow
                 inputField.requestFocusInWindow

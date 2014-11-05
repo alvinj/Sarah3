@@ -22,6 +22,7 @@ import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import com.devdaily.sarah.gui.SwingUtils
 import com.valleyprogramming.littlelogger.LittleLogger
+import com.devdaily.sarah.gui.GreenLight
 
 object Brain {
 
@@ -138,6 +139,9 @@ with Logging
       case MouthIsFinishedSpeaking =>
            handleMouthIsFinishedSpeakingMessage
            
+      case CouldNotHandleInputText =>
+           handleCouldNotHandleInputText
+           
            
       // TODO a lot of this "state" code is old and can be deleted
       case SetAwarenessState(state) =>
@@ -157,6 +161,7 @@ with Logging
            // we receive this message when a brain helper is handling a spoken request.
            // currently what i want to do is to clear the input text area asap.
            sarah.clearInputArea
+           sarah.updateUISpokenTextIsBeingAnalyzed
       
       // other
       
@@ -203,6 +208,7 @@ with Logging
     def handleMouthIsSpeakingMessage {
         lastTimeBrainStartedSpeaking = System.currentTimeMillis
         mouthIsSpeaking = true
+        tellUISpeakingHasStarted
     }
     
     def handleMouthIsFinishedSpeakingMessage {
@@ -211,6 +217,10 @@ with Logging
         markThisAsTheLastTimeSarahSpoke
         mouthIsSpeaking = false
         tellUISpeakingHasEnded
+    }
+    
+    def handleCouldNotHandleInputText {
+        tellUIWeCouldNotHandleInputText
     }
     
   
@@ -242,24 +252,29 @@ with Logging
     // needed for Future use
     import scala.concurrent.ExecutionContext.Implicits.global
     
+    def tellUIWeCouldNotHandleInputText {
+        PluginUtils.runInThread(SwingUtils.invokeLater(sarah.updateUIWeCouldNotHandleInputText))
+    }
+    
     def tellUISpeakingHasEnded {
-        val f1 = Future {  
-            SwingUtilities.invokeLater(new Runnable {
-                def run {
-                    sarah.updateUISpeakingHasEnded
-                }
-            })
-        }
+        PluginUtils.runInThread(SwingUtils.invokeLater(sarah.updateUISpeakingHasEnded))
+//        val f1 = Future {  
+//            SwingUtils.invokeLater(sarah.updateUISpeakingHasEnded)
+//        }
+    }
+    
+    def tellUISpeakingHasStarted {
+        PluginUtils.runInThread(SwingUtils.invokeLater(sarah.updateUISpeakingHasStarted))
+//        val f1 = Future {  
+//            SwingUtils.invokeLater(sarah.updateUISpeakingHasStarted)
+//        }
     }
     
     def updateSarahsUI {
-        val f1 = Future {  
-            SwingUtilities.invokeLater(new Runnable {
-                def run {
-                    sarah.updateUI
-                }
-            })
-        }
+        PluginUtils.runInThread(SwingUtils.invokeLater(sarah.updateUI))
+//        val f1 = Future {  
+//            SwingUtils.invokeLater(sarah.updateUI)
+//        }
     }
     
     def inSleepMode = if (getAwarenessState == Brain.AWARENESS_STATE_AWAKE) false else true

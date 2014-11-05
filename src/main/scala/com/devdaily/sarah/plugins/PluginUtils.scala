@@ -11,7 +11,18 @@ import java.io.File
 import java.io.FileFilter
 
 object PluginUtils {
-  
+
+    /**
+     * Runs the block of code you pass in in a Java Thread.
+     */
+    def runInThread[A](blockOfCode: => A) {
+        val thread = new Thread {
+            override def run {
+                blockOfCode
+            }
+        }.start
+    }
+    
   /**
    * Gets a random string from the given file. The file is assumed to have one or more
    * lines of strings that are meant to be read in as an array/list.

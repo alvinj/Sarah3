@@ -92,6 +92,10 @@ with Logging {
 
     /* end constructor area */
     
+    def setStatusIndicator(status: StatusIndicator) {
+        mainFrame.setStatusIndicator(status)
+    }
+
     def clearInputWidget {
         SwingUtils.invokeLater(inputWidget.setText(""))
     }
@@ -118,9 +122,28 @@ with Logging {
     def getTextField = mainFrame.inputField
 
     def updateUIBasedOnStates {}
+
+    def updateUISpokenTextIsBeingAnalyzed {
+        setStatusIndicator(YellowLight)
+    }
+
+    // this is running on the swing thread (edt), so 'sleep' isn't really a good idea
+    def updateUIWeCouldNotHandleInputText {
+        setStatusIndicator(RedLight)
+        PluginUtils.runInThread({
+            Thread.sleep(1000)
+            setStatusIndicator(NeutralLight)
+        })
+    }
+
+    def updateUISpeakingHasStarted {
+        //inputWidget.setText("")
+        setStatusIndicator(GreenLight)
+    }
     
     def updateUISpeakingHasEnded {
         inputWidget.setText("")
+        setStatusIndicator(NeutralLight)
     }
     
     private def getDesiredFrameSize: Dimension = {

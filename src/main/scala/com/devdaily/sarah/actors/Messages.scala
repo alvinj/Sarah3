@@ -8,6 +8,7 @@ case object ConnectToSiblings
 case object Hello
 
 case object BrainHelperIsHandlingSpokenRequest
+case object CouldNotHandleInputText
 
 case class SetMinimumWaitTimeAfterSpeaking(waitTime: Int)
 case class SetAwarenessState(state: Int)

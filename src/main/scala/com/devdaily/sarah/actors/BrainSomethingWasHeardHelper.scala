@@ -123,7 +123,7 @@ with Logging
   private def handleVoiceCommand(whatTheComputerThinksISaid: String) {
       logger.info("entered handleVoiceCommand, text is: " + whatTheComputerThinksISaid)
 
-      // clear the input widget (currently a textfield) asap
+      // this updates the ui (clear input area, set status light)
       brain ! BrainHelperIsHandlingSpokenRequest
 
       val textTheUserSaid = whatTheComputerThinksISaid.toLowerCase
@@ -153,7 +153,8 @@ with Logging
               // didn't understand something, but i don't like this approach
               // TODO a bit of a kludge to update the ui; i don't really use these states in Sarah2
               //brain ! PleaseSay(getRandomImSorryPhrase)
-              brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
+              //brain ! SetBrainStates(getAwarenessState, Brain.EARS_STATE_LISTENING, Brain.MOUTH_STATE_NOT_SPEAKING)
+              brain ! CouldNotHandleInputText
           }
       }
   }

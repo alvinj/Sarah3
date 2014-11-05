@@ -45,6 +45,7 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.script.ScriptEngineManager
 import com.devdaily.sarah.utils.AppleScriptUtils
+import com.devdaily.sarah.gui.StatusIndicator
 
 /**
  * Sarah starts running in the `main` method here.
@@ -167,6 +168,10 @@ class Sarah extends Logging {
    * ---------------------------------------------
    */
   
+  def setStatusIndicator(status: StatusIndicator) {
+      mainFrameController.setStatusIndicator(status)
+  }
+  
   def clearInputArea {
       mainFrameController.clearInputWidget
   }
@@ -183,6 +188,11 @@ class Sarah extends Logging {
   private def startSpeechRecognitioner {
       // NOTE i'm ignoring whether it succeeded or not as that will be obvious
       val succeeded = AppleScriptUtils.executeAppleScriptCommand(Global.appleScriptCmdToStartSpeechRecognition)
+  }
+
+  private def stopSpeechRecognition {
+      // NOTE i'm ignoring whether it succeeded or not as that will be obvious
+      val succeeded = AppleScriptUtils.executeAppleScriptCommand(Global.appleScriptCmdToStopSpeechRecognition)
   }
 
   // TODO figure out what *really* needs to be done to get focus back to the input window.
@@ -218,9 +228,21 @@ class Sarah extends Logging {
       mainFrameController.updateUIBasedOnStates
   }
 
+  def updateUISpeakingHasStarted {
+      mainFrameController.updateUISpeakingHasStarted
+  }
+  
   def updateUISpeakingHasEnded {
       mainFrameController.updateUISpeakingHasEnded
       requestFocusInWindowAndTextField
+  }
+  
+  def updateUISpokenTextIsBeingAnalyzed {
+      mainFrameController.updateUISpokenTextIsBeingAnalyzed
+  }
+  
+  def updateUIWeCouldNotHandleInputText {
+      mainFrameController.updateUIWeCouldNotHandleInputText
   }
   
   private def loadSarahPropertiesFile(canonConfigFilename: String) {
@@ -590,6 +612,7 @@ class Sarah extends Logging {
 
   // TODO get this code to work properly. System.exit isn't really exiting.
   def shutdown {
+      stopSpeechRecognition
       logger.debug("Shutting down.")
       brain ! Die
       PluginUtils.sleep(500)

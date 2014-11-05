@@ -3,19 +3,50 @@ package com.devdaily.sarah.gui
 import javax.swing._
 import java.awt._
 
+trait StatusIndicator
+case object RedLight extends StatusIndicator
+case object YellowLight extends StatusIndicator
+case object GreenLight extends StatusIndicator
+case object NeutralLight extends StatusIndicator
+
 class MainFrame3 extends JFrame {
   
+    // status icon images 
+    val trafficLightRed = new ImageIcon(classOf[MainFrame3].getResource("trafficLightRedSmall.jpg"))
+    val trafficLightYellow = new ImageIcon(classOf[MainFrame3].getResource("trafficLightYellowSmall.jpg"))
+    val trafficLightGreen = new ImageIcon(classOf[MainFrame3].getResource("trafficLightGreenSmall.jpg"))
+    val trafficLightNeutral = new ImageIcon(classOf[MainFrame3].getResource("trafficLightNeutralSmall.jpg"))
+    
     setLayout(new BorderLayout)
 
+    // input area
+    // TODO fix this layout with jgoodies or other
+    val statusLabel = new JLabel
     val inputField = new JTextField
+    inputField.setPreferredSize(new Dimension(910, 44))
+    val inputPanel = new JPanel
+    val inputLayout = new FlowLayout(FlowLayout.LEFT, 10, 0)
+    inputPanel.setLayout(inputLayout)
+    statusLabel.setIcon(trafficLightNeutral)
+    inputPanel.add(statusLabel)
+    inputPanel.add(inputField)
+    
+    // output area
     val outputArea = new JEditorPane
     val scrollPane = new JScrollPane(outputArea)
     
     configureInputField
     configureOutputArea
     
-    getContentPane.add(inputField, BorderLayout.NORTH)
+    getContentPane.add(inputPanel, BorderLayout.NORTH)
     getContentPane.add(scrollPane, BorderLayout.CENTER)
+    
+    def setStatusIndicator(status: StatusIndicator): Unit = status match {
+        case RedLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightRed))
+        case YellowLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightYellow))
+        case GreenLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightGreen))
+        case NeutralLight => SwingUtils.invokeLater(statusLabel.setIcon(trafficLightNeutral))
+    }
     
     private def configureOutputArea {
         outputArea.setEditable(false)

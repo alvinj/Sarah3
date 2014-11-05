@@ -181,13 +181,17 @@ class Sarah extends Logging {
    * start the speech recog 
    */
   def handleWindowGainedFocusEvent {
-      startSpeechRecognitioner
+      PluginUtils.runInThread({
+          Thread.sleep(1000)  // TODO this is a kludge to make sure the ui is really shown
+          startSpeechRecognitioner
+      })
   }
   
   // the 'fn' key is applescript "key code 36"
   private def startSpeechRecognitioner {
       // NOTE i'm ignoring whether it succeeded or not as that will be obvious
       val succeeded = AppleScriptUtils.executeAppleScriptCommand(Global.appleScriptCmdToStartSpeechRecognition)
+      logger.debug(s"AppleScript succeeded: $succeeded")
   }
 
   private def stopSpeechRecognition {

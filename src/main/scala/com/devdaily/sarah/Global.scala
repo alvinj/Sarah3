@@ -7,13 +7,13 @@ tell application "System Events"
     key code 63
     key code 63
 end tell
-""".stripMargin
+"""
 
     val appleScriptCmdToStopSpeechRecognition = """
 tell application "System Events"
     key code 63
 end tell
-""".stripMargin
+"""
 
 
 }

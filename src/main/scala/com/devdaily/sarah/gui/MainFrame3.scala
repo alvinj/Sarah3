@@ -83,8 +83,23 @@ class MainFrame3 extends JFrame {
         val styleSheet = kit.getStyleSheet
         val fontFamily = outputArea.getFont.getFamily // get the system font family
         styleSheet.addRule(s"body {color:#333333; background-color: #ffffff; font-family: ${fontFamily}; margin: 4px; }")
-        styleSheet.addRule("h1 {color: #303030;}");
-        styleSheet.addRule("pre {font : 14px monaco; color : black; }")
+        styleSheet.addRule(s"h1 {color: #303030;}")
+        styleSheet.addRule(s"pre {font: 14px monaco; color: #333333; }")
+        
+        // table - not working as desired (and quitting for the evening)
+        //val tableLineColor = "#cccccc"
+        //styleSheet.addRule(s"table { border: 1px solid ${tableLineColor}; }")
+        //styleSheet.addRule(s"th    { border: 1px solid ${tableLineColor}; }")
+        //styleSheet.addRule(s"td    { border: 1px solid ${tableLineColor}; }")
+
+        // td
+        styleSheet.addRule(s"td {font-family: ${fontFamily}; font-size: 14px; }")
+        styleSheet.addRule(s"td.center {text-align: center; }")
+        styleSheet.addRule(s"td.currency {text-align: right; }")
+        styleSheet.addRule(s"td.left {text-align: left; }")
+        styleSheet.addRule(s"td.number {text-align: right; }")
+        styleSheet.addRule(s"td.right {text-align: right; }")
+
         outputArea.setDocument(kit.createDefaultDocument)
     }
 

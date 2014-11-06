@@ -5,6 +5,7 @@ import java.awt._
 import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.layout.CellConstraints
+import javax.swing.text.html.HTMLEditorKit
 
 trait StatusIndicator
 case object RedLight extends StatusIndicator
@@ -31,7 +32,7 @@ class MainFrame3 extends JFrame {
     val inputPanel = buildInputPanel
     
     // output area
-    val outputArea = new JEditorPane
+    val outputArea = new JEditorPane("text/html", "")
     val scrollPane = new JScrollPane(outputArea)
     
     configureInputField
@@ -72,10 +73,19 @@ class MainFrame3 extends JFrame {
 
     private def configureOutputArea {
         outputArea.setEditable(false)
-        outputArea.setFont(inputField.getFont.deriveFont(20.0f))
-        outputArea.setBackground(new Color(230, 230, 230))
         outputArea.setMargin(new Insets(20, 20, 20, 20))
-        outputArea.setText("Welcome to Sarah III")
+        outputArea.setText("<h1>Welcome to Sarah III</h1>")
+        configureOutputAreaHtml
+    }
+    
+    private def configureOutputAreaHtml {
+        val kit = new HTMLEditorKit
+        val styleSheet = kit.getStyleSheet
+        val fontFamily = outputArea.getFont.getFamily // get the system font family
+        styleSheet.addRule(s"body {color:#333333; background-color: #ffffff; font-family: ${fontFamily}; margin: 4px; }")
+        styleSheet.addRule("h1 {color: #303030;}");
+        styleSheet.addRule("pre {font : 14px monaco; color : black; }")
+        outputArea.setDocument(kit.createDefaultDocument)
     }
 
     private def configureInputField {
